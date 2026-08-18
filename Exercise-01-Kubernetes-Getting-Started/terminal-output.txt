@@ -1,0 +1,59 @@
+=== EXERCISE 1: KUBERNETES GETTING STARTED (HELLO POD) ===
+
+$ minikube status
+minikube
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+
+$ kubectl get nodes
+NAME       STATUS   ROLES           AGE     VERSION
+minikube   Ready    control-plane   4m24s   v1.37.0
+
+$ kubectl get pods -o wide
+NAME        READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+hello-k8s   1/1     Running   0          66s   10.244.0.3   minikube   <none>           <none>
+
+$ kubectl get svc hello-k8s
+NAME        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+hello-k8s   NodePort   10.102.92.107   <none>        80:30924/TCP   53s
+
+Direct NodePort Access: http://192.168.49.2:30924
+
+$ curl -I -s http://192.168.49.2:30924
+HTTP/1.1 200 OK
+Server: nginx/1.31.6
+Date: Sun, 11 Oct 2026 14:08:04 GMT
+Content-Type: text/html
+Content-Length: 896
+
+$ curl -s http://192.168.49.2:30924
+
+
+=== VERIFICATION SUCCESSFUL: Nginx Pod Running and Responsive ===
+
+
+================================================================================
+GIT REPOSITORY PUSH VERIFICATION (TERMINAL COMMANDS & OUTPUT)
+================================================================================
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+Changes to be committed:
+  new file / directory: Exercise-01-Kubernetes-Getting-Started
+
+$ git add Exercise-01-Kubernetes-Getting-Started
+$ git commit -m "Add Exercise-01-Kubernetes-Getting-Started"
+[main b018bfa] Add Exercise-01-Kubernetes-Getting-Started
+
+$ git push origin main
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 4.50 KiB | 4.50 MiB/s, done.
+To https://github.com/Gsai442005/U.G.-Gagan-Sai-1BM23IS273-DEVOPS-.git
+   main -> main
+================================================================================
