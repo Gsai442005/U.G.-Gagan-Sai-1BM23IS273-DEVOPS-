@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out delivery monitoring source...'
+            }
+        }
+        stage('Simulate Metrics') {
+            steps {
+                echo 'Simulating quick commerce operations...'
+                sh 'python3 delivery_monitoring/delivery_metrics.py'
+            }
+        }
+        stage('Verify Prometheus Targets') {
+            steps {
+                echo 'Scraping operational metrics...'
+                sh 'curl -s http://localhost:8000/metrics | grep -E "total_deliveries|pending_deliveries"'
+            }
+        }
+    }
+}
