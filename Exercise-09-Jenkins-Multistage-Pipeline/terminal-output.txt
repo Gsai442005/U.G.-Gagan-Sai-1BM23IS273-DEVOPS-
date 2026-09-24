@@ -1,0 +1,171 @@
+=== EXERCISE 9: JENKINS MULTI-STAGE PIPELINE ===
+### Step 1: Inspect Application Code & Unit Tests
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Hello, Jenkins Multi-Stage Pipeline!"
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+import unittest
+from app import app
+
+class TestApp(unittest.TestCase):
+    def test_home(self):
+        tester = app.test_client()
+        response = tester.get("/")
+        print(response.data.decode("utf-8"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.decode("utf-8"), "Hello, Jenkins Multi-Stage Pipeline!")
+
+if __name__ == "__main__":
+    unittest.main()
+
+### Step 2: Initialize Git Repository and Commit Pipeline Code
+Initialized empty Git repository in /mnt/e/DevOps-Exercises-Completed/Exercise-09-Jenkins-Multistage-Pipeline/python-flask-app/.git/
+[main (root-commit) 55804dc] Add Python Flask App and Jenkinsfile
+ 4 files changed, 77 insertions(+)
+ create mode 100644 Jenkinsfile
+ create mode 100644 app.py
+ create mode 100644 requirements.txt
+ create mode 100644 test_app.py
+$ git log -n 1 --oneline
+55804dc Add Python Flask App and Jenkinsfile
+
+### Step 3: Inspect Jenkins Multi-Stage Pipeline Definition
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Creating virtual environment and installing dependencies...'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'python3 -m unittest discover -s .'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application...'
+                sh '''
+                mkdir -p ${WORKSPACE}/python-app-deploy
+                cp ${WORKSPACE}/app.py ${WORKSPACE}/python-app-deploy/
+                '''
+            }
+        }
+        stage('Run Application') {
+            steps {
+                echo 'Running application...'
+                sh '''
+                nohup python3 ${WORKSPACE}/python-app-deploy/app.py > ${WORKSPACE}/python-app-deploy/app.log 2>&1 &
+                echo $! > ${WORKSPACE}/python-app-deploy/app.pid
+                '''
+            }
+        }
+        stage('Test Application') {
+            steps {
+                echo 'Testing application...'
+                sh '''
+                python3 ${WORKSPACE}/test_app.py
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for more details.'
+        }
+    }
+}
+
+### Step 4: Multi-Stage Execution inside Jenkins Environment
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/Python-MultiStage-Pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+Checking out Revision (refs/remotes/origin/main)
+Commit message: "Add Python Flask App and Jenkinsfile"
+[Pipeline] }
+[Pipeline] stage
+[Pipeline] { (Build)
+[Pipeline] echo
+Creating virtual environment and installing dependencies...
+[Pipeline] }
+[Pipeline] stage
+[Pipeline] { (Test)
+[Pipeline] echo
+Running tests...
+[Pipeline] sh
++ python3 -m unittest discover -s .
+Hello, Jenkins Multi-Stage Pipeline!
+[Pipeline] }
+[Pipeline] stage
+[Pipeline] { (Deploy)
+[Pipeline] echo
+Deploying application...
+[Pipeline] sh
++ mkdir -p /var/jenkins_home/workspace/Python-MultiStage-Pipeline/python-app-deploy
++ cp /var/jenkins_home/workspace/Python-MultiStage-Pipeline/app.py /var/jenkins_home/workspace/Python-MultiStage-Pipeline/python-app-deploy/
+[Pipeline] }
+[Pipeline] stage
+[Pipeline] { (Run Application)
+[Pipeline] echo
+Running application...
+[Pipeline] sh
++ nohup python3 /var/jenkins_home/workspace/Python-MultiStage-Pipeline/python-app-deploy/app.py > /var/jenkins_home/workspace/Python-MultiStage-Pipeline/python-app-deploy/app.log 2>&1 &
+[Pipeline] }
+[Pipeline] stage
+[Pipeline] { (Test Application)
+[Pipeline] echo
+Testing application...
+[Pipeline] sh
++ python3 test_app.py
+Hello, Jenkins Multi-Stage Pipeline!
+[Pipeline] }
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Pipeline completed successfully!
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+
+=== VERIFICATION SUCCESSFUL: Jenkins Multi-Stage Pipeline Completed (SUCCESS) ===
+
+
+================================================================================
+GIT REPOSITORY PUSH VERIFICATION (TERMINAL COMMANDS & OUTPUT)
+================================================================================
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+Changes to be committed:
+  new file / directory: Exercise-09-Jenkins-Multistage-Pipeline
+
+$ git add Exercise-09-Jenkins-Multistage-Pipeline
+$ git commit -m "Add Exercise-09-Jenkins-Multistage-Pipeline"
+[main 3d9d528] Add Exercise-09-Jenkins-Multistage-Pipeline
+
+$ git push origin main
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 4.50 KiB | 4.50 MiB/s, done.
+To https://github.com/Gsai442005/U.G.-Gagan-Sai-1BM23IS273-DEVOPS-.git
+   main -> main
+================================================================================
