@@ -1,0 +1,184 @@
+﻿# Exercise 03: Scaling Flask App using ReplicaSets
+
+## Overview
+Simulates an e-commerce flash sale scenario (Flipkart Big Billion Days / Amazon Prime Day). Demonstrates how a Kubernetes ReplicaSet manages replica counts, auto-heals when pods are deleted, and dynamically scales out from 3 to 5 pods to handle burst traffic.
+
+## Deliverables
+- `app/app.py`: Flash sale app exposing `/`, `/buy` (showing serving pod hostname), and `/health`.
+- `app/Dockerfile`: Multi-thread Gunicorn runner on Python 3.11-slim.
+- `flashsale-replicaset.yaml`: ReplicaSet manifest with liveness/readiness probes and Service.
+- `run_ex3.sh`: Automated execution script.
+
+## Commands Executed
+```bash
+eval $(minikube docker-env)
+docker build -t flashsale:1.0 .
+kubectl apply -f flashsale-replicaset.yaml
+kubectl get rs flashsale-rs
+kubectl get pods -l app=flashsale
+kubectl scale rs flashsale-rs --replicas=5
+kubectl get rs flashsale-rs
+kubectl delete pod <pod-name>
+kubectl get pods -l app=flashsale
+curl -s http://<NodeIP>:<NodePort>/
+curl -s http://<NodeIP>:<NodePort>/buy
+curl -s http://<NodeIP>:<NodePort>/health
+```
+
+## Expected Result
+- Initial ReplicaSet scales to 3 pods in Ready state.
+- Dynamic scaling increases replica count to 5 pods.
+- Deletion of a single pod triggers automatic self-healing by the ReplicaSet controller.
+- Requests to `/buy` return item details and demonstrate which pod served the request.
+
+## Verification Status
+- **Status:** PASS
+- **Node IP / Port:** `http://192.168.49.2:30149`
+- **Output:** Captured in `terminal-output.txt`
+
+## Terminal Execution Output
+
+``text
+=== EXERCISE 3: REPLICASETS AND SCALING ===
+$ eval $(minikube docker-env)
+$ docker build -t flashsale:1.0 .
+Sending build context to Docker daemon  3.584kB
+
+#1 [internal] load build definition from Dockerfile
+#1 DONE 0.0s
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 214B done
+#1 DONE 0.0s
+#2 [internal] load metadata for docker.io/library/python:3.11-slim
+#2 DONE 4.0s
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+#4 [1/4] FROM docker.io/library/python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce
+#4 resolve docker.io/library/python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce 0.0s done
+#4 DONE 0.2s
+#5 [internal] load build context
+#5 transferring context: 793B done
+#5 DONE 0.1s
+#4 [1/4] FROM docker.io/library/python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce
+#4 sha256:496c1a902b3a93cea3e54b90b79dbcaa0e58ad90c3fe9dd0a43c9557dc47f17d 0B / 250B 0.2s
+#4 sha256:496c1a902b3a93cea3e54b90b79dbcaa0e58ad90c3fe9dd0a43c9557dc47f17d 250B / 250B 0.3s done
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 0B / 14.46MB 0.2s
+#4 sha256:0f752a1982d6f819fc2c9e78ac1514c63f2f2e1dec7885ffd4cb6809ba4a26ca 0B / 1.29MB 0.2s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 1.05MB / 14.46MB 0.8s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 2.10MB / 14.46MB 0.9s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 3.15MB / 14.46MB 1.1s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 4.19MB / 14.46MB 1.2s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 5.24MB / 14.46MB 1.4s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 6.29MB / 14.46MB 1.5s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 7.34MB / 14.46MB 1.7s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 8.39MB / 14.46MB 1.8s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 10.49MB / 14.46MB 2.0s
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 11.53MB / 14.46MB 2.1s
+#4 sha256:0f752a1982d6f819fc2c9e78ac1514c63f2f2e1dec7885ffd4cb6809ba4a26ca 1.29MB / 1.29MB 2.2s done
+#4 sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 14.46MB / 14.46MB 2.3s done
+#4 extracting sha256:0f752a1982d6f819fc2c9e78ac1514c63f2f2e1dec7885ffd4cb6809ba4a26ca
+#4 extracting sha256:0f752a1982d6f819fc2c9e78ac1514c63f2f2e1dec7885ffd4cb6809ba4a26ca 0.2s done
+#4 extracting sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1
+#4 extracting sha256:759a7f30c31818dda4c97b407b24d93da479c306568d185ced927e1a749164f1 0.6s done
+#4 extracting sha256:496c1a902b3a93cea3e54b90b79dbcaa0e58ad90c3fe9dd0a43c9557dc47f17d
+#4 extracting sha256:496c1a902b3a93cea3e54b90b79dbcaa0e58ad90c3fe9dd0a43c9557dc47f17d 0.0s done
+#4 DONE 3.2s
+#6 [2/4] WORKDIR /app
+#6 DONE 0.1s
+#7 [3/4] COPY app.py .
+#7 DONE 0.1s
+#8 [4/4] RUN pip install --no-cache-dir flask gunicorn
+#8 3.083 Collecting flask
+#8 3.609   Downloading flask-3.1.3-py3-none-any.whl.metadata (3.2 kB)
+#8 3.806 Collecting gunicorn
+#8 3.838   Downloading gunicorn-26.2.0-py3-none-any.whl.metadata (5.5 kB)
+#8 4.298 Collecting blinker>=1.9.0 (from flask)
+#8 4.339   Downloading blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+#8 4.493 Collecting click>=8.1.3 (from flask)
+#8 4.522   Downloading click-8.5.0-py3-none-any.whl.metadata (2.6 kB)
+#8 4.764 Collecting itsdangerous>=2.2.0 (from flask)
+#8 4.796   Downloading itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+#8 4.930 Collecting jinja2>=3.1.2 (from flask)
+#8 5.253   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#8 5.912 Collecting markupsafe>=2.1.1 (from flask)
+#8 6.095   Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+#8 6.420 Collecting werkzeug>=3.1.0 (from flask)
+#8 6.462   Downloading werkzeug-3.1.9-py3-none-any.whl.metadata (4.1 kB)
+#8 6.563 Downloading flask-3.1.3-py3-none-any.whl (103 kB)
+#8 8.228    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 103.4/103.4 kB 68.5 kB/s eta 0:00:00
+#8 8.258 Downloading gunicorn-26.2.0-py3-none-any.whl (228 kB)
+#8 11.94    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 228.4/228.4 kB 61.5 kB/s eta 0:00:00
+#8 12.01 Downloading blinker-1.9.0-py3-none-any.whl (8.5 kB)
+#8 12.46 Downloading click-8.5.0-py3-none-any.whl (125 kB)
+#8 14.50    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 125.3/125.3 kB 60.1 kB/s eta 0:00:00
+#8 14.59 Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+#8 14.89 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#8 18.45    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.9/134.9 kB 36.8 kB/s eta 0:00:00
+#8 18.53 Downloading markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+#8 19.39 Downloading werkzeug-3.1.9-py3-none-any.whl (228 kB)
+#8 23.90    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 228.7/228.7 kB 52.4 kB/s eta 0:00:00
+#8 23.98 Installing collected packages: markupsafe, itsdangerous, gunicorn, click, blinker, werkzeug, jinja2, flask
+#8 24.75 Successfully installed blinker-1.9.0 click-8.5.0 flask-3.1.3 gunicorn-26.2.0 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 werkzeug-3.1.9
+#8 24.75 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#8 27.92 
+#8 27.92 [notice] A new release of pip is available: 24.0 -> 26.2.1
+#8 27.92 [notice] To update, run: pip install --upgrade pip
+#8 DONE 28.1s
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 1.2s done
+#9 exporting manifest sha256:f6a9e609b51d4de134114ac534ebf79875309ed7a60eb3707bd18be1b44d34d8 0.0s done
+#9 exporting config sha256:87ea0726a7a9ef1a5b9155623291ac6f00d4ab1a85954085a3c9a975a16a352c 0.0s done
+#9 naming to docker.io/library/flashsale:1.0 done
+#9 DONE 4.0s
+#4 [1/4] FROM docker.io/library/python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce
+#4 sha256:ecc510c1e359bdc007b39802570bb7e4dec7d6ebccf357c3201a74299113e05e 29.84MB / 29.84MB 2.7s done
+#4 DONE 6.0s
+$ kubectl apply -f /mnt/e/DevOps-Exercises-Completed/Exercise-03-ReplicaSets-Scaling/flashsale-replicaset.yaml
+replicaset.apps/flashsale-rs created
+service/flashsale-svc created
+Waiting for ReplicaSet to stabilize at 3 replicas...
+$ kubectl get rs flashsale-rs
+NAME           DESIRED   CURRENT   READY   AGE
+flashsale-rs   3         3         3       11s
+$ kubectl get pods -l app=flashsale
+NAME                 READY   STATUS    RESTARTS   AGE
+flashsale-rs-lsff7   1/1     Running   0          11s
+flashsale-rs-rpmmn   1/1     Running   0          11s
+flashsale-rs-stzc6   1/1     Running   0          11s
+$ kubectl scale rs flashsale-rs --replicas=5
+replicaset.apps/flashsale-rs scaled
+Waiting for scaled pods to be ready...
+$ kubectl get rs flashsale-rs
+NAME           DESIRED   CURRENT   READY   AGE
+flashsale-rs   5         5         5       22s
+$ kubectl get pods -l app=flashsale
+NAME                 READY   STATUS    RESTARTS   AGE
+flashsale-rs-kfkgb   1/1     Running   0          11s
+flashsale-rs-lsff7   1/1     Running   0          22s
+flashsale-rs-rpmmn   1/1     Running   0          22s
+flashsale-rs-stzc6   1/1     Running   0          22s
+flashsale-rs-wb8t6   1/1     Running   0          11s
+$ kubectl delete pod flashsale-rs-kfkgb
+pod "flashsale-rs-kfkgb" deleted
+Waiting for ReplicaSet auto-healing...
+$ kubectl get pods -l app=flashsale
+NAME                 READY   STATUS    RESTARTS   AGE
+flashsale-rs-7h86q   1/1     Running   0          7s
+flashsale-rs-lsff7   1/1     Running   0          29s
+flashsale-rs-rpmmn   1/1     Running   0          29s
+flashsale-rs-stzc6   1/1     Running   0          29s
+flashsale-rs-wb8t6   1/1     Running   0          18s
+Service Endpoint: http://192.168.49.2:30149
+Testing / endpoint:
+{"message":"Welcome to Big Sale!","pod":"flashsale-rs-lsff7","ts":1791727973.9085677}
+
+Testing /buy flash sale endpoint:
+{"item":"Headphones","served_by_pod":"flashsale-rs-rpmmn","status":"success","time":"14:12:53","user":"user703"}
+
+Testing /health endpoint:
+{"pod":"flashsale-rs-wb8t6","status":"healthy"}
+
+=== VERIFICATION SUCCESSFUL: ReplicaSets Scaled and Self-Healed ===
+``
