@@ -1,0 +1,5 @@
+FROM python:3.9-slim
+WORKDIR /app
+COPY shopping_cart.py /app/
+RUN pip install flask==2.2.5 werkzeug==2.2.3
+CMD ["python", "shopping_cart.py"]
