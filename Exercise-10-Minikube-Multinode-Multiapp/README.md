@@ -2,7 +2,7 @@
 
 ## Overview
 Deploys a high-availability multi-node Kubernetes architecture for an e-commerce platform across 3 nodes (`devops-multinode`, `devops-multinode-m02`, `devops-multinode-m03`). Deploys two microservices:
-1. **Product Catalog** (`product-catalog`): 2 replicas distributed across nodes with PodAntiAffinity, exposing `/products`.
+1. **Product Catalog** (`product-catalog`): 2 replicas distributed across nodes with PodAntiAffinity, exposing `/products`. 
 2. **Shopping Cart** (`shopping-cart`): 3 replicas distributed across nodes with PodAntiAffinity, exposing `/cart`.
 
 ## Deliverables
