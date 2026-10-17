@@ -12,7 +12,7 @@ Scraped by Prometheus on port 9090 with automated alerting rules and visualized 
 - `delivery_monitoring/delivery_metrics.py`: Python metrics generator exposing port 8000.
 - `delivery_monitoring/prometheus.yml`: Prometheus scrape targets (`delivery_service` @ 8000).
 - `delivery_monitoring/alert_rules.yml`: Rules for `HighPendingDeliveries` and `HighAverageDeliveryTime`.
-- `delivery_monitoring/Jenkinsfile`: Continuous monitoring pipeline definition.
+- `delivery_monitoring/Jenkinsfile`: Continuous monitoring pipeline definition. 
 - `run_ex6.sh`: Automated execution script.
 
 ## Commands Executed
