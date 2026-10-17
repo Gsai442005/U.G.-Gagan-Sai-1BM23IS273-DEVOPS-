@@ -1,4 +1,4 @@
-﻿# Exercise 09: Jenkins Multi-Stage Pipeline
+﻿# Exercise 09: Jenkins Multi-Stage Pipeline 
 
 ## Overview
 Automates a multi-stage Continuous Integration and Continuous Deployment (CI/CD) pipeline for a Python Flask application comprising five distinct pipeline stages:
