@@ -1,7 +1,7 @@
 ﻿# Exercise 07: Jenkins CI Automation Setup
 
 ## Overview
-Deploys and initializes the Jenkins Long-Term Support (LTS) automation master container in Docker, exposing port 8080 (Web UI) and port 50000 (Agent communication), mounting a persistent volume (`jenkins_home`), and retrieving the initial admin security token.
+Deploys and initializes the Jenkins Long-Term Support (LTS) automation master container in Docker, exposing port 8080 (Web UI) and port 50000 (Agent communication), mounting a persistent volume (`jenkins_home`), and retrieving the initial admin security token. 
 
 ## Deliverables
 - `run_ex7.sh`: Automated execution and verification script.
