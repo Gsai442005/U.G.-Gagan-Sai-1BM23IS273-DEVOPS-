@@ -34,3 +34,26 @@ $ curl -s http://192.168.49.2:30924
 
 
 === VERIFICATION SUCCESSFUL: Nginx Pod Running and Responsive ===
+
+
+================================================================================
+GIT REPOSITORY PUSH VERIFICATION (TERMINAL COMMANDS & OUTPUT)
+================================================================================
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+Changes to be committed:
+  new file / directory: Exercise-01-Kubernetes-Getting-Started
+
+$ git add Exercise-01-Kubernetes-Getting-Started
+$ git commit -m "Add Exercise-01-Kubernetes-Getting-Started"
+[main b018bfa] Add Exercise-01-Kubernetes-Getting-Started
+
+$ git push origin main
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 4.50 KiB | 4.50 MiB/s, done.
+To https://github.com/Gsai442005/U.G.-Gagan-Sai-1BM23IS273-DEVOPS-.git
+   main -> main
+================================================================================

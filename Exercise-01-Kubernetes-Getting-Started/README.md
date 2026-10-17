@@ -76,3 +76,33 @@ font-family: Tahoma, Verdana, Arial, sans-serif; }
 
 === VERIFICATION SUCCESSFUL: Nginx Pod Running and Responsive ===
 ``
+
+
+---
+
+## Git Version Control & Push Verification
+
+The terminal session log below confirms that this exercise was staged, committed, and pushed directly to the remote GitHub repository via the command line:
+
+```bash
+$ git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new directory: Exercise-01-Kubernetes-Getting-Started/
+
+$ git add Exercise-01-Kubernetes-Getting-Started
+$ git commit -m "Add Exercise-01-Kubernetes-Getting-Started"
+[main b018bfa] Add Exercise-01-Kubernetes-Getting-Started
+ 4 files changed, 250 insertions(+)
+
+$ git push origin main
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 4.50 KiB | 4.50 MiB/s, done.
+Total 7 (delta 2), reused 0 (delta 0), pack-reused 0
+To https://github.com/Gsai442005/U.G.-Gagan-Sai-1BM23IS273-DEVOPS-.git
+   main -> main
+```

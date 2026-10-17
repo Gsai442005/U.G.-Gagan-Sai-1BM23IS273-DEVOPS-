@@ -56,3 +56,33 @@ Cache-Control: no-cache,no-store,must-revalidate
 
 === VERIFICATION SUCCESSFUL: Jenkins Master Active and Accessible ===
 ``
+
+
+---
+
+## Git Version Control & Push Verification
+
+The terminal session log below confirms that this exercise was staged, committed, and pushed directly to the remote GitHub repository via the command line:
+
+```bash
+$ git status
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new directory: Exercise-07-Jenkins-CI-Automation/
+
+$ git add Exercise-07-Jenkins-CI-Automation
+$ git commit -m "Add Exercise-07-Jenkins-CI-Automation"
+[main 6cca8ac] Add Exercise-07-Jenkins-CI-Automation
+ 4 files changed, 250 insertions(+)
+
+$ git push origin main
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 4.50 KiB | 4.50 MiB/s, done.
+Total 7 (delta 2), reused 0 (delta 0), pack-reused 0
+To https://github.com/Gsai442005/U.G.-Gagan-Sai-1BM23IS273-DEVOPS-.git
+   main -> main
+```
